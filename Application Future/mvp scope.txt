@@ -1,0 +1,8 @@
+MVP Scope
+
+1. Auth system (Supabase) with Google + GitHub
+2. Initial content feed: RSS + Dev.to + Medium + Twitter (static JSON first)
+3. Feed layout using responsive grid (ShadCN + Tailwind)
+4. Bookmark + like (stored in Supabase)
+5. Share + note-taking per post
+6. Admin page to manage sources manually

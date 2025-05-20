@@ -1,0 +1,11 @@
+| Module             | Description                                                       |
+| ------------------ | ----------------------------------------------------------------- |
+| `Auth`             | Google/GitHub login via Supabase                                  |
+| `Dashboard`        | Feed UI with filter options (source, category, tag)               |
+| `Content Engine`   | Fetches, parses, deduplicates, and ranks content from all sources |
+| `Bookmarks`        | User can save posts to bookmarks                                  |
+| `Likes`            | Local or DB-stored like system                                    |
+| `Notes`            | Rich text or markdown notes per post                              |
+| `Share`            | Native share / copy to clipboard / Twitter share                  |
+| `Settings`         | Manage followed sources, tags, etc.                               |
+| `Admin` (optional) | Add/remove sources manually, trigger recrawls                     |
