@@ -7,7 +7,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { Bookmark, BookmarkCheck, Heart, HeartHandshake } from "lucide-react";
 import { useState } from "react";
-import { upsertInteraction } from "@/lib/db";
+import { upsertInteraction, upsertNote } from "@/lib/db";
 import { useUser } from "@/context/UserContext";
 
 interface ContentItem {
@@ -20,34 +20,58 @@ interface ContentItem {
   publishedAt: string;
 }
 
-export default function ContentCard({ item, initialLiked, initialBookmarked }: { item: ContentItem, initialLiked?: boolean, initialBookmarked?: boolean }) {
-  const [liked, setLiked] = useState<boolean>(initialLiked ?? false)
-const [bookmarked, setBookmarked] = useState<boolean>(initialBookmarked ?? false)
+export default function ContentCard({
+  item,
+  initialLiked,
+  initialBookmarked,
+  initialNote,
+}: {
+  item: ContentItem;
+  initialLiked?: boolean;
+  initialBookmarked?: boolean;
+  initialNote?: string;
+}) {
+  const [liked, setLiked] = useState<boolean>(initialLiked ?? false);
+  const [bookmarked, setBookmarked] = useState<boolean>(
+    initialBookmarked ?? false
+  );
+  const [note, setNote] = useState(initialNote ?? "");
+  const [saving, setSaving] = useState(false);
 
-useEffect(() => {
-  setLiked(initialLiked ?? false)
-}, [initialLiked])
+  useEffect(() => {
+    setLiked(initialLiked ?? false);
+  }, [initialLiked]);
 
-useEffect(() => {
-  setBookmarked(initialBookmarked ?? false)
-}, [initialBookmarked])
+  useEffect(() => {
+    setBookmarked(initialBookmarked ?? false);
+  }, [initialBookmarked]);
 
+  useEffect(() => {
+    setNote(initialNote ?? "");
+  }, [initialNote]);
 
   const user = useUser();
 
   const handleLike = async () => {
-  if (!user) return
-  const newLiked = !liked
-  setLiked(newLiked)
-  await upsertInteraction(user.id, item.id, newLiked, bookmarked)
-}
+    if (!user) return;
+    const newLiked = !liked;
+    setLiked(newLiked);
+    await upsertInteraction(user.id, item.id, newLiked, bookmarked);
+  };
 
-const handleBookmark = async () => {
-  if (!user) return
-  const newBookmarked = !bookmarked
-  setBookmarked(newBookmarked)
-  await upsertInteraction(user.id, item.id, liked, newBookmarked)
-}
+  const handleBookmark = async () => {
+    if (!user) return;
+    const newBookmarked = !bookmarked;
+    setBookmarked(newBookmarked);
+    await upsertInteraction(user.id, item.id, liked, newBookmarked);
+  };
+
+  const handleNoteSave = async () => {
+    if (!user) return;
+    setSaving(true);
+    await upsertNote(user.id, item.id, note);
+    setSaving(false);
+  };
 
   return (
     <Card className="hover:shadow-lg transition-shadow">
@@ -80,6 +104,19 @@ const handleBookmark = async () => {
                 <Bookmark size={16} />
               )}
             </button>
+            <div className="mt-4">
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                onBlur={handleNoteSave}
+                rows={3}
+                placeholder="Write your note here..."
+                className="w-full text-sm p-2 border rounded-md resize-none bg-background text-foreground"
+              />
+              {saving && (
+                <p className="text-xs text-muted-foreground mt-1">Saving...</p>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>

@@ -30,22 +30,38 @@ export async function upsertInteraction(
   bookmarked: boolean
 ) {
   const { data, error } = await supabase
-    .from('interactions')
+    .from("interactions")
     .upsert(
       { user_id: userId, post_id: postId, liked, bookmarked },
       { onConflict: "user_id,post_id" }
     );
 
-  if (error) console.error('Upsert error:', error.message)
-  return { data, error }
+  if (error) console.error("Upsert error:", error.message);
+  return { data, error };
 }
 
-
 export async function getUserInteractions(userId: string) {
-  const { data, error } = await supabase
-    .from("interactions")
-    .select("post_id, liked, bookmarked")
-    .eq("user_id", userId);
+  return await supabase
+    .from('interactions')
+    .select('post_id, liked, bookmarked')
+    .eq('user_id', userId)
+}
 
+export async function upsertNote(userId: string, postId: string, note: string) {
+  const { data, error } = await supabase
+    .from("notes")
+    .upsert(
+      { user_id: userId, post_id: postId, note },
+      { onConflict: "user_id,post_id" }
+    );
+
+  if (error) console.error("upsertNote error:", error.message);
   return { data, error };
+}
+
+export async function getUserNotes(userId: string) {
+  return await supabase
+    .from('notes')
+    .select('post_id, note')
+    .eq('user_id', userId)
 }
