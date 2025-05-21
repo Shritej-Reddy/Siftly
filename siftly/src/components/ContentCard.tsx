@@ -37,6 +37,7 @@ export default function ContentCard({
   );
   const [note, setNote] = useState(initialNote ?? "");
   const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     setLiked(initialLiked ?? false);
@@ -69,8 +70,12 @@ export default function ContentCard({
   const handleNoteSave = async () => {
     if (!user) return;
     setSaving(true);
-    await upsertNote(user.id, item.id, note);
+    const { error } = await upsertNote(user.id, item.id, note);
     setSaving(false);
+    if (!error) {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 1500);
+    }
   };
 
   return (
@@ -113,9 +118,24 @@ export default function ContentCard({
                 placeholder="Write your note here..."
                 className="w-full text-sm p-2 border rounded-md resize-none bg-background text-foreground"
               />
-              {saving && (
-                <p className="text-xs text-muted-foreground mt-1">Saving...</p>
+              {note.length > 0 && (
+                <button
+                  onClick={() => {
+                    const cleared = "";
+                    setNote(cleared);
+                    upsertNote(user!.id, item.id, cleared);
+                  }}
+                  className="text-xs mt-1 underline text-red-500"
+                >
+                  Clear Note
+                </button>
               )}
+
+              {saving ? (
+                <p className="text-xs text-muted-foreground mt-1">Saving...</p>
+              ) : saveSuccess ? (
+                <p className="text-xs text-green-500 mt-1">✓ Note saved</p>
+              ) : null}
             </div>
           </div>
         </div>
